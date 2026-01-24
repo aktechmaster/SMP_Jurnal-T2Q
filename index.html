@@ -280,14 +280,7 @@
                 <hr>
                 <div class="badge bg-tahsin"><i class="fa-solid fa-book-open-reader" style="margin-right:8px"></i> PROGRES TAHSIN</div>
                 
-                <div class="input-group">
-                    <label for="nilaiTahsin">Nilai Tahsin (Opsional)</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-star-half-stroke"></i>
-                        <input type="number" id="nilaiTahsin" placeholder="0 - 100" min="0" max="100">
-                    </div>
-                </div>
-
+    
                 <div class="input-group">
                     <label for="batasTilawah">Batas Tilawah Terakhir (Opsional)</label>
                     <div class="input-wrapper">
@@ -322,10 +315,10 @@
                 </div>
 
                 <div class="input-group" style="margin-top: 24px;">
-                    <label for="nilaiTahfidz">Nilai Tahfidz (Opsional)</label>
+                    <label for="targetTahfidz">Target (Opsional)</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-award"></i>
-                        <input type="number" id="nilaiTahfidz" placeholder="0 - 100" min="0" max="100">
+                        <input type="text" id="target" placeholder="Surat apa/ayat apa s.d berapa">
                     </div>
                 </div>
             </div>
@@ -338,7 +331,7 @@
 
    <script>
     /* --- KONFIGURASI --- */
-    // GANTI URL INI DENGAN URL WEB APP TERBARU ANDA
+    // Pastikan URL ini hasil DEPLOY TERBARU
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsjj_ogUcat2qRUDDcidgzaNNwtzmcl_2LKNuLn5tsAngJUdd7v-e00UaBJz_kK9qQ4A/exec"; 
 
     const elKelas = document.getElementById('kelas');
@@ -350,18 +343,15 @@
     elKelas.addEventListener('change', function() {
         const kelasVal = this.value;
         
-        // Reset Visual Dropdown
         elPengampu.innerHTML = '<option>⏳ Mengambil data...</option>';
         elPengampu.disabled = true;
         elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Pengampu Terlebih Dahulu --</option>';
         elSiswa.disabled = true;
 
-        // Fetch ke Google Script
         fetch(`${SCRIPT_URL}?action=getGuru&kelas=${kelasVal}`)
             .then(response => response.json())
             .then(data => {
                 let html = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
-                // Handle jika data kosong atau error
                 if(Array.isArray(data) && data.length > 0) {
                     data.forEach(nama => html += `<option value="${nama}">${nama}</option>`);
                 } else {
@@ -385,7 +375,6 @@
         elSiswa.innerHTML = '<option>⏳ Mengambil siswa...</option>';
         elSiswa.disabled = true;
 
-        // EncodeURI agar spasi/karakter khusus aman
         const url = `${SCRIPT_URL}?action=getSiswa&kelas=${kelasVal}&guru=${encodeURIComponent(guruVal)}`;
 
         fetch(url)
@@ -407,18 +396,16 @@
     });
 
     // --- 3. LOGIKA TAMPILAN (MENU) ---
-    // Ini fungsi yang hilang sebelumnya
     
     function cekKehadiran() {
         const val = document.getElementById('kehadiran').value;
-        const secTahsin = document.getElementById('section-tahsin');
+        const secTahsin = document.getElementById('section-tahsin'); // Pastikan ID section ini ada di HTML
         const secTahfidz = document.getElementById('section-tahfidz');
         
         if(val === 'Hadir') {
             secTahsin.style.display = 'block';
             secTahsin.classList.add('show');
         } else {
-            // Jika tidak hadir, sembunyikan semua dan reset inputannya
             secTahsin.style.display = 'none';
             secTahsin.classList.remove('show');
             secTahfidz.style.display = 'none';
@@ -437,53 +424,68 @@
             secTahfidz.style.display = 'none';
             secTahfidz.classList.remove('show');
             document.getElementById('batasTahfidz').value = "";
-            document.getElementById('nilaiTahfidz').value = "";
+            document.getElementById('target').value = ""; // Reset Target
         }
     }
 
     function resetScoringFields() {
-        document.getElementById('nilaiTahsin').value = "";
+        // Hapus reset nilaiTahsin karena sudah tidak ada
         document.getElementById('batasTilawah').value = "";
         document.getElementById('statusSetor').value = "";
         document.getElementById('batasTahfidz').value = "";
-        document.getElementById('nilaiTahfidz').value = "";
+        
+        // Cek apakah elemen target ada sebelum di-reset (untuk menghindari error jika elemen belum dibuat)
+        const elTarget = document.getElementById('target');
+        if(elTarget) elTarget.value = ""; 
     }
 
     // --- 4. SUBMIT HANDLER (POST) ---
     document.getElementById('t2qForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Validasi Logika Tambahan
+        // Validasi
         const statusHadir = document.getElementById('kehadiran').value;
         const statusSetor = document.getElementById('statusSetor').value;
         const batasTahfidz = document.getElementById('batasTahfidz').value;
 
-        if (statusHadir === 'Hadir' && statusSetor === 'Setor' && !batasTahfidz.trim()) {
-            alert("⚠️ PERHATIAN:\nAnda memilih status 'Setor Hafalan', maka Kolom 'Batas Tahfidz' WAJIB diisi.");
-            document.getElementById('batasTahfidz').focus();
-            return; 
+        // Validasi jika Setor Hafalan, maka batas & target wajib diisi
+        if (statusHadir === 'Hadir' && statusSetor === 'Setor') {
+             if(!batasTahfidz.trim()) {
+                alert("⚠️ Mohon isi Batas Tahfidz.");
+                document.getElementById('batasTahfidz').focus();
+                return; 
+             }
+             // Validasi Target (Opsional, aktifkan jika target wajib diisi)
+             /*
+             if(document.getElementById('target').value === "") {
+                alert("⚠️ Mohon isi Target.");
+                document.getElementById('target').focus();
+                return;
+             }
+             */
         }
 
         if(!confirm("Apakah data sudah benar dan siap dikirim?")) return;
 
-        // Ubah Tombol jadi Loading
+        // Loading State
         const originalBtnText = btnSubmit.innerHTML;
         btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN...';
         btnSubmit.disabled = true;
 
+        // Siapkan Object Data (Updated)
         const objData = {
             kelas: elKelas.value,
             pengampu: elPengampu.value,
             siswa: elSiswa.value,
             kehadiran: statusHadir,
-            nilaiTahsin: document.getElementById('nilaiTahsin').value,
+            // nilaiTahsin dihapus
             batasTilawah: document.getElementById('batasTilawah').value,
             statusSetor: statusSetor,
             batasTahfidz: batasTahfidz,
-            nilaiTahfidz: document.getElementById('nilaiTahfidz').value
+            target: document.getElementById('target').value // Mengambil value dari ID target
         };
 
-        // Kirim via FETCH POST
+        // Kirim Fetch
         fetch(SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify(objData)
@@ -493,7 +495,7 @@
             if(result.status === 'success') {
                 alert("✅ ALHAMDULILLAH\nData Berhasil Disimpan!");
                 
-                // Smart Reset
+                // Reset
                 elSiswa.value = ""; 
                 document.getElementById('kehadiran').value = ""; 
                 resetScoringFields();
@@ -502,7 +504,6 @@
                 document.getElementById('section-tahsin').style.display = 'none';
                 document.getElementById('section-tahfidz').style.display = 'none';
                 
-                // Kembalikan tombol & scroll
                 btnSubmit.innerHTML = originalBtnText;
                 btnSubmit.disabled = false;
                 elSiswa.focus();
@@ -521,6 +522,7 @@
 </body>
 
 </html>
+
 
 
 
