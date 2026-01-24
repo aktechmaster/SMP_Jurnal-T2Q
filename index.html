@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T2Q Smart Input (Light Theme)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- PERUBAHAN PALET WARNA KE TEMA TERANG --- */
+        :root {
+            --bg-color: #f0f2f5; /* Latar belakang terang */
+            --card-bg: #ffffff; /* Kartu putih bersih */
+            --accent: #0284c7; /* Biru yang sedikit lebih tua agar kontras di putih */
+            --accent-hover: #0369a1;
+            --text-main: #334155; /* Teks utama gelap (Slate dark) */
+            --text-muted: #64748b; /* Teks pendukung abu-abu */
+            --border: #e2e8f0; /* Garis pinggir abu muda */
+            --input-bg: #f8fafc; /* Latar input sangat muda */
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px; /* Padding sedikit disesuaikan untuk mobile */
+        }
+
+        /* Container Utama */
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 12px; /* Radius sedikit dikurangi agar lebih tegas */
+            /* Shadow yang lebih lembut untuk tema terang */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header Dekoratif - Sedikit lebih cerah gradasinya */
+        .header {
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            padding: 30px 25px;
+            text-align: center;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: white;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 8px 0 0;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Form Padding */
+        form {
+            padding: 35px 30px;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 24px; /* Jarak antar input sedikit diperlebar */
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Custom Select & Input Wrapper for Icons */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.3s;
+            font-size: 1rem;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 14px 16px 14px 48px; /* Space for icon */
+            background-color: var(--input-bg);
+            border: 2px solid var(--border); /* Border sedikit lebih tebal */
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s ease;
+            appearance: none;
+        }
+
+        /* Custom Arrow for Select */
+        .select-arrow::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Focus States - Warna biru lebih tegas */
+        select:focus, input:focus {
+            border-color: var(--accent);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); /* Shadow biru transparan saat fokus */
+        }
+        
+        .input-wrapper:focus-within i {
+            color: var(--accent);
+        }
+
+        /* Tombol Submit */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);
+        }
+
+        /* Hidden Sections Animation */
+        .hidden-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(-15px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .show {
+            display: block;
+            animation: slideIn 0.3s forwards ease-out;
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Status Badge Logic Visuals - Disesuaikan untuk background putih */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+        .bg-tahsin { background: #dcfce7; color: #166534; } /* Hijau yang lebih ramah di mata */
+        .bg-tahfidz { background: #ffe4e6; color: #be123c; } /* Merah muda yang ramah */
+
+        /* Garis Pemisah */
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 30px 0;
+        }
+
+        /* Placeholder color */
+        ::placeholder {
+            color: #cbd5e1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+    <img src="logosmpit.png" alt="Logo SMPIT" style="height: 80px; width: auto; margin-bottom: 15px;">
+    <h2>INPUT DATA T2Q</h2>
+    <p>Sistem Manajemen Mutaba'ah Digital</p>
+</div>
+
+        <form id="t2qForm">
+            
+            <div class="input-group">
+                <label for="kelas">Pilih Kelas</label>
+                <div class="input-wrapper select-arrow">
+                    <i class="fa-solid fa-school-flag"></i>
+                    <select id="kelas" required>
+                        <option value="" disabled selected>-- Pilih Kelas --</option>
+                        <option value="7">Kelas 7</option>
+                        <option value="8">Kelas 8</option>
+                        <option value="9">Kelas 9</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="pengampu">Pengampu</label>
+                <div class="input-wrapper select-arrow">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <select id="pengampu" required>
+                        <option value="" disabled selected>-- Pilih Pengampu --</option>
+                        <option value="Ustadz Abdullah">Ustadz Abdullah</option>
+                        <option value="Ustadz Budi">Ustadz Budi</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="siswa">Nama Siswa</label>
+                <div class="input-wrapper select-arrow">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <select id="siswa" required>
+                        <option value="" disabled selected>-- Pilih Siswa --</option>
+                        <option value="Ahmad">Ahmad</option>
+                        <option value="Fulan">Fulan</option>
+                        <option value="Zaid">Zaid</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="kehadiran">Status Kehadiran</label>
+                <div class="input-wrapper select-arrow">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <select id="kehadiran" required onchange="cekKehadiran()">
+                        <option value="" disabled selected>-- Pilih Status --</option>
+                        <option value="Hadir">Hadir</option>
+                        <option value="Tidak Hadir" style="color: var(--danger); font-weight:600;">Tidak Hadir (Alpha/Izin/Sakit)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="section-tahsin" class="hidden-section">
+                <hr>
+                <div class="badge bg-tahsin"><i class="fa-solid fa-book-open-reader" style="margin-right:8px"></i> PROGRES TAHSIN</div>
+                
+                <div class="input-group">
+                    <label for="nilaiTahsin">Nilai Tahsin (Opsional)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-star-half-stroke"></i>
+                        <input type="number" id="nilaiTahsin" placeholder="0 - 100" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="batasTilawah">Batas Tilawah Terakhir (Opsional)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <input type="text" id="batasTilawah" placeholder="Contoh: Juz 5, Hal 10...">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="statusSetor" style="color: var(--accent);">Apakah Setor Hafalan Hari Ini?</label>
+                    <div class="input-wrapper select-arrow">
+                        <i class="fa-solid fa-circle-question" style="color: var(--accent);"></i>
+                        <select id="statusSetor" onchange="cekSetoran()" style="border-color: var(--accent);">
+                            <option value="" disabled selected>-- Konfirmasi Setoran --</option>
+                            <option value="Setor" style="font-weight:bold; color: var(--accent);">Ya, Setor Hafalan</option>
+                            <option value="Tidak Setor">Tidak Setor</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-tahfidz" class="hidden-section">
+                <hr>
+                <div class="badge bg-tahfidz"><i class="fa-solid fa-quran" style="margin-right:8px"></i> PROGRES TAHFIDZ</div>
+
+                <div class="input-group" style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px dashed var(--accent);">
+                    <label for="batasTahfidz" style="color: var(--accent); margin-bottom: 15px;">Batas Tahfidz (Wajib Diisi)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-pen-nib" style="color: var(--accent);"></i>
+                        <input type="text" id="batasTahfidz" placeholder="Surat apa & ayat berapa?..." style="background-color: white;">
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-top: 24px;">
+                    <label for="nilaiTahfidz">Nilai Tahfidz (Opsional)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-award"></i>
+                        <input type="number" id="nilaiTahfidz" placeholder="0 - 100" min="0" max="100">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                KIRIM DATA SEKARANG <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+        </form>
+    </div>
+
+   <script>
+  const elKelas = document.getElementById('kelas');
+  const elPengampu = document.getElementById('pengampu');
+  const elSiswa = document.getElementById('siswa');
+  const btnSubmit = document.querySelector('.btn-submit');
+
+  // --- 1. SETTING KELAS ---
+  window.onload = function() {
+    elKelas.innerHTML = `
+      <option value="" disabled selected>-- Pilih Kelas --</option>
+      <option value="7">Kelas 7</option>
+      <option value="8">Kelas 8</option>
+      <option value="9">Kelas 9</option>
+    `;
+    elPengampu.disabled = true;
+    elSiswa.disabled = true;
+  };
+
+  // --- 2. PILIH KELAS -> CARI USTADZ (Sesuai Sheet) ---
+  elKelas.addEventListener('change', function() {
+    const kelasVal = this.value; // Nilai "7", "8", atau "9"
+    
+    elPengampu.innerHTML = '<option>⏳ Membuka Database...</option>';
+    elPengampu.disabled = true;
+    elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+    elSiswa.disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(data) {
+        // Cek jika error (misal nama sheet salah)
+        if (data.length > 0 && data[0].includes("ERROR")) {
+            alert(data[0]); 
+            elPengampu.innerHTML = '<option disabled>Error Database</option>';
+            return;
+        }
+
+        let html = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
+        data.forEach(nama => {
+          html += `<option value="${nama}">${nama}</option>`;
+        });
+        elPengampu.innerHTML = html;
+        elPengampu.disabled = false;
+      })
+      .withFailureHandler(function(err) {
+         alert("Gagal Koneksi: " + err);
+      })
+      .getGuruByKelas(kelasVal);
+  });
+
+  // --- 3. PILIH USTADZ -> CARI SISWA ---
+  elPengampu.addEventListener('change', function() {
+    const guruVal = this.value;
+    const kelasVal = elKelas.value; 
+    
+    elSiswa.innerHTML = '<option>⏳ Mengambil data siswa...</option>';
+    elSiswa.disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(data) {
+        let html = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+        if (data.length === 0) {
+            html = '<option disabled>Tidak ada siswa</option>';
+        } else {
+            data.forEach(nama => {
+            html += `<option value="${nama}">${nama}</option>`;
+            });
+        }
+        elSiswa.innerHTML = html;
+        elSiswa.disabled = false;
+      })
+      .getSiswaByGuru(kelasVal, guruVal);
+  });
+
+  // --- LOGIKA TAMPILAN LAIN ---
+  function cekKehadiran() {
+    const val = document.getElementById('kehadiran').value;
+    const secTahsin = document.getElementById('section-tahsin');
+    const secTahfidz = document.getElementById('section-tahfidz');
+    if(val === 'Hadir') {
+      secTahsin.style.display = 'block';
+      secTahsin.classList.add('show');
+    } else {
+      secTahsin.style.display = 'none';
+      secTahfidz.style.display = 'none';
+    }
+  }
+
+  function cekSetoran() {
+    const val = document.getElementById('statusSetor').value;
+    const secTahfidz = document.getElementById('section-tahfidz');
+    if(val === 'Setor') {
+      secTahfidz.style.display = 'block';
+      secTahfidz.classList.add('show');
+    } else {
+      secTahfidz.style.display = 'none';
+    }
+  }
+
+  if (
+  document.getElementById('kehadiran').value === 'Hadir' &&
+  document.getElementById('statusSetor').value === 'Setor' &&
+  !document.getElementById('batasTahfidz').value
+) {
+  alert("Batas Tahfidz wajib diisi jika siswa setor.");
+  btnSubmit.disabled = false;
+  btnSubmit.innerHTML = 'KIRIM DATA SEKARANG';
+  return;
+}
+
+
+  document.getElementById('t2qForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if(!confirm("Kirim data sekarang?")) return;
+
+    btnSubmit.innerHTML = 'MENYIMPAN...';
+    btnSubmit.disabled = true;
+
+    const objData = {
+      kelas: elKelas.value,
+      pengampu: elPengampu.value,
+      siswa: elSiswa.value,
+      kehadiran: document.getElementById('kehadiran').value,
+      nilaiTahsin: document.getElementById('nilaiTahsin').value,
+      batasTilawah: document.getElementById('batasTilawah').value,
+      statusSetor: document.getElementById('statusSetor').value,
+      batasTahfidz: document.getElementById('batasTahfidz').value,
+      nilaiTahfidz: document.getElementById('nilaiTahfidz').value
+    };
+
+    google.script.run
+      .withSuccessHandler(function() {
+        alert("✅ Data Tersimpan!");
+        document.getElementById('t2qForm').reset();
+        elPengampu.innerHTML = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
+        elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+        cekKehadiran();
+        btnSubmit.innerHTML = 'KIRIM DATA SEKARANG';
+        btnSubmit.disabled = false;
+      })
+      .prosesSimpanData(objData);
+  });
+
+  document.getElementById('section-tahsin').style.display = 'none';
+document.getElementById('section-tahfidz').style.display = 'none';
+
+</script>
+
+</body>
+</html>
