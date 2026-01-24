@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T2Q Smart Input (Light Theme)</title>
+    <title>T2Q Smart Bulk Input</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- PERUBAHAN PALET WARNA KE TEMA TERANG --- */
+        /* --- CSS ASLI ANDA (DIPERTAHANKAN) --- */
         :root {
-            --bg-color: #f0f2f5; /* Latar belakang terang */
-            --card-bg: #ffffff; /* Kartu putih bersih */
-            --accent: #0284c7; /* Biru yang sedikit lebih tua agar kontras di putih */
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --accent: #0284c7;
             --accent-hover: #0369a1;
-            --text-main: #334155; /* Teks utama gelap (Slate dark) */
-            --text-muted: #64748b; /* Teks pendukung abu-abu */
-            --border: #e2e8f0; /* Garis pinggir abu muda */
-            --input-bg: #f8fafc; /* Latar input sangat muda */
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
             --success: #10b981;
             --danger: #ef4444;
         }
@@ -31,187 +31,118 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Ubah ke start agar bisa scroll panjang */
             min-height: 100vh;
-            padding: 20px 10px; /* Padding sedikit disesuaikan untuk mobile */
+            padding: 20px 10px;
         }
 
-        /* Container Utama */
         .container {
             background-color: var(--card-bg);
             width: 100%;
-            max-width: 480px;
-            border-radius: 12px; /* Radius sedikit dikurangi agar lebih tegas */
-            /* Shadow yang lebih lembut untuk tema terang */
+            max-width: 550px; /* Sedikit diperlebar */
+            border-radius: 12px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
             overflow: hidden;
             position: relative;
+            margin-bottom: 80px; /* Space untuk tombol floating */
         }
 
-        /* Header Dekoratif - Sedikit lebih cerah gradasinya */
         .header {
             background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
-            padding: 30px 25px;
+            padding: 25px;
             text-align: center;
         }
 
-        .header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: white;
-            letter-spacing: 0.5px;
-            font-weight: 700;
-        }
+        .header h2 { margin: 0; font-size: 1.4rem; color: white; font-weight: 700; }
+        .header p { margin: 5px 0 0; color: rgba(255,255,255,0.9); font-size: 0.85rem; }
+
+        /* --- LOGIKA STYLE BARU UNTUK KARTU SISWA --- */
+        .control-area { padding: 20px; background: #fff; border-bottom: 1px solid var(--border); }
         
-        .header p {
-            margin: 8px 0 0;
-            color: rgba(255,255,255,0.9);
-            font-size: 0.9rem;
-            font-weight: 500;
+        .student-list-area {
+            padding: 10px 20px 20px 20px;
+            background: var(--bg-color);
         }
 
-        /* Form Padding */
-        form {
-            padding: 35px 30px;
-        }
-
-        /* Input Groups */
-        .input-group {
-            margin-bottom: 24px; /* Jarak antar input sedikit diperlebar */
-            position: relative;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        /* Custom Select & Input Wrapper for Icons */
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            pointer-events: none;
-            transition: color 0.3s;
-            font-size: 1rem;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 14px 16px 14px 48px; /* Space for icon */
-            background-color: var(--input-bg);
-            border: 2px solid var(--border); /* Border sedikit lebih tebal */
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 1rem;
-            font-family: inherit;
-            font-weight: 500;
-            outline: none;
-            transition: all 0.2s ease;
-            appearance: none;
-        }
-
-        /* Custom Arrow for Select */
-        .select-arrow::after {
-            content: '\f107';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            pointer-events: none;
-        }
-
-        /* Focus States - Warna biru lebih tegas */
-        select:focus, input:focus {
-            border-color: var(--accent);
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1); /* Shadow biru transparan saat fokus */
-        }
-        
-        .input-wrapper:focus-within i {
-            color: var(--accent);
-        }
-
-        /* Tombol Submit */
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1.05rem;
-            cursor: pointer;
+        /* Kartu Per Siswa */
+        .student-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             transition: all 0.2s;
+        }
+        
+        .student-card.active-setor { border-left: 5px solid var(--success); }
+        .student-card.absent { border-left: 5px solid var(--danger); opacity: 0.8; }
+
+        .student-header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+            margin-bottom: 15px;
         }
 
-        .btn-submit:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);
+        .student-name { font-weight: 700; color: var(--text-main); font-size: 1.05rem; }
+
+        /* Menggunakan Style Input Anda pada Konteks Lebih Kecil */
+        .input-group { margin-bottom: 12px; position: relative; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
+        
+        .input-wrapper { position: relative; }
+        .input-wrapper i {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 0.9rem; pointer-events: none;
+        }
+
+        .mini-input, .mini-select {
+            width: 100%;
+            padding: 10px 10px 10px 35px; /* Icon space */
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        
+        .mini-input:focus, .mini-select:focus {
+            border-color: var(--accent);
+            background: #fff;
         }
 
         /* Hidden Sections Animation */
-        .hidden-section {
-            display: none;
-            opacity: 0;
-            transform: translateY(-15px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
+        .hidden-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
+        .show-details { display: block; animation: slideIn 0.3s forwards; }
 
-        .show {
-            display: block;
-            animation: slideIn 0.3s forwards ease-out;
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes slideIn {
-            to { opacity: 1; transform: translateY(0); }
+        /* Floating Submit Button */
+        .bottom-action {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; padding: 15px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            display: flex; justify-content: center; z-index: 100;
         }
+        
+        .btn-submit {
+            width: 100%; max-width: 500px;
+            padding: 14px;
+            background-color: var(--accent);
+            color: white; border: none; border-radius: 8px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+            transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-submit:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+        .btn-submit:disabled { background-color: var(--text-muted); cursor: not-allowed; transform: none; }
 
-        /* Status Badge Logic Visuals - Disesuaikan untuk background putih */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-        }
-        .bg-tahsin { background: #dcfce7; color: #166534; } /* Hijau yang lebih ramah di mata */
-        .bg-tahfidz { background: #ffe4e6; color: #be123c; } /* Merah muda yang ramah */
-
-        /* Garis Pemisah */
-        hr {
-            border: 0;
-            border-top: 1px solid var(--border);
-            margin: 30px 0;
-        }
-
-        /* Placeholder color */
-        ::placeholder {
-            color: #cbd5e1;
-        }
+        /* Badge Styles */
+        .badge-tahsin { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+        .badge-tahfidz { background: #ffe4e6; color: #be123c; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; margin-bottom: 8px; margin-top: 10px;}
 
     </style>
 </head>
@@ -219,18 +150,16 @@
 
     <div class="container">
         <div class="header">
-    <img src="logosmpit.png" alt="Logo SMPIT" style="height: 80px; width: auto; margin-bottom: 15px;">
-    <h2>INPUT DATA T2Q</h2>
-    <p>Sistem Manajemen Mutaba'ah Digital</p>
-</div>
+            <h2 id="header-title">INPUT T2Q KELAS</h2>
+            <p>Mode Input Cepat (Bulk Entry)</p>
+        </div>
 
-        <form id="t2qForm">
-            
+        <div class="control-area">
             <div class="input-group">
-                <label for="kelas">Pilih Kelas</label>
-                <div class="input-wrapper select-arrow">
+                <label>Pilih Kelas</label>
+                <div class="input-wrapper">
                     <i class="fa-solid fa-school-flag"></i>
-                    <select id="kelas" required>
+                    <select id="kelas" class="mini-select" style="font-weight:bold">
                         <option value="" disabled selected>-- Pilih Kelas --</option>
                         <option value="7">Kelas 7</option>
                         <option value="8">Kelas 8</option>
@@ -239,291 +168,268 @@
                 </div>
             </div>
 
-            <div class="input-group">
-                <label for="pengampu">Pengampu</label>
-                <div class="input-wrapper select-arrow">
+            <div class="input-group" style="margin-bottom: 0;">
+                <label>Pengampu</label>
+                <div class="input-wrapper">
                     <i class="fa-solid fa-chalkboard-user"></i>
-                    <select id="pengampu" required>
-                        <option value="" disabled selected>-- Pilih Pengampu --</option>
-                        <option value="Ustadz Abdullah">Ustadz Abdullah</option>
-                        <option value="Ustadz Budi">Ustadz Budi</option>
+                    <select id="pengampu" class="mini-select" disabled>
+                        <option>-- Pilih Kelas Dulu --</option>
                     </select>
                 </div>
             </div>
-
-            <div class="input-group">
-                <label for="siswa">Nama Siswa</label>
-                <div class="input-wrapper select-arrow">
-                    <i class="fa-solid fa-user-graduate"></i>
-                    <select id="siswa" required>
-                        <option value="" disabled selected>-- Pilih Siswa --</option>
-                        <option value="Ahmad">Ahmad</option>
-                        <option value="Fulan">Fulan</option>
-                        <option value="Zaid">Zaid</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label for="kehadiran">Status Kehadiran</label>
-                <div class="input-wrapper select-arrow">
-                    <i class="fa-solid fa-clipboard-list"></i>
-                    <select id="kehadiran" required onchange="cekKehadiran()">
-                        <option value="" disabled selected>-- Pilih Status --</option>
-                        <option value="Hadir">Hadir</option>
-                        <option value="Tidak Hadir" style="color: var(--danger); font-weight:600;">Tidak Hadir (Alpha/Izin/Sakit)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="section-tahsin" class="hidden-section">
-                <hr>
-                <div class="badge bg-tahsin"><i class="fa-solid fa-book-open-reader" style="margin-right:8px"></i> PROGRES TAHSIN</div>
-                
-    
-                <div class="input-group">
-                    <label for="batasTilawah">Batas Tilawah Terakhir (Opsional)</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-bookmark"></i>
-                        <input type="text" id="batasTilawah" placeholder="Contoh: Juz 5, Hal 10...">
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="statusSetor" style="color: var(--accent);">Apakah Setor Hafalan Hari Ini?</label>
-                    <div class="input-wrapper select-arrow">
-                        <i class="fa-solid fa-circle-question" style="color: var(--accent);"></i>
-                        <select id="statusSetor" onchange="cekSetoran()" style="border-color: var(--accent);">
-                            <option value="" disabled selected>-- Konfirmasi Setoran --</option>
-                            <option value="Setor" style="font-weight:bold; color: var(--accent);">Ya, Setor Hafalan</option>
-                            <option value="Tidak Setor">Tidak Setor</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-tahfidz" class="hidden-section">
-                <hr>
-                <div class="badge bg-tahfidz"><i class="fa-solid fa-quran" style="margin-right:8px"></i> PROGRES TAHFIDZ</div>
-
-                <div class="input-group" style="background-color: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px dashed var(--accent);">
-                    <label for="batasTahfidz" style="color: var(--accent); margin-bottom: 15px;">Batas Tahfidz (Wajib Diisi)</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-pen-nib" style="color: var(--accent);"></i>
-                        <input type="text" id="batasTahfidz" placeholder="Surat apa & ayat berapa?..." style="background-color: white;">
-                    </div>
-                </div>
-
-                <div class="input-group" style="margin-top: 24px;">
-                    <label for="targetTahfidz">Target (Opsional)</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-award"></i>
-                        <input type="text" id="target" placeholder="Surat apa/ayat apa s.d berapa">
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-submit">
-                KIRIM DATA SEKARANG <i class="fa-solid fa-arrow-right-long"></i>
+            
+            <button id="btnLoad" class="btn-submit" style="margin-top: 15px; width:100%; padding: 10px; background: var(--text-main); display:none;">
+                <i class="fa-solid fa-users-viewfinder"></i> TAMPILKAN DAFTAR SISWA
             </button>
+        </div>
+
+        <form id="bulkForm">
+            <div id="student-list-area" class="student-list-area">
+                <div style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    <i class="fa-solid fa-arrow-up"></i><br>Silakan pilih Kelas & Pengampu diatas.
+                </div>
+            </div>
         </form>
     </div>
 
-   <script>
-    /* --- KONFIGURASI --- */
-    // Pastikan URL ini hasil DEPLOY TERBARU
+    <div class="bottom-action" id="action-bar" style="display:none;">
+        <button type="button" class="btn-submit" onclick="submitData()">
+            KIRIM DATA (<span id="count-siswa">0</span>) SISWA <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+
+<script>
+    // --- GANTI URL INI DENGAN HASIL DEPLOY TERBARU ---
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsjj_ogUcat2qRUDDcidgzaNNwtzmcl_2LKNuLn5tsAngJUdd7v-e00UaBJz_kK9qQ4A/exec"; 
 
     const elKelas = document.getElementById('kelas');
     const elPengampu = document.getElementById('pengampu');
-    const elSiswa = document.getElementById('siswa');
-    const btnSubmit = document.querySelector('.btn-submit');
-    
-    // --- 1. PILIH KELAS -> CARI GURU (GET) ---
-    elKelas.addEventListener('change', function() {
-        const kelasVal = this.value;
-        
-        elPengampu.innerHTML = '<option>⏳ Mengambil data...</option>';
-        elPengampu.disabled = true;
-        elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Pengampu Terlebih Dahulu --</option>';
-        elSiswa.disabled = true;
+    const btnLoad = document.getElementById('btnLoad');
+    const areaList = document.getElementById('student-list-area');
+    const actionBar = document.getElementById('action-bar');
+    const countSpan = document.getElementById('count-siswa');
 
-        fetch(`${SCRIPT_URL}?action=getGuru&kelas=${kelasVal}`)
-            .then(response => response.json())
+    // 1. GET GURU
+    elKelas.addEventListener('change', function() {
+        elPengampu.innerHTML = '<option>⏳ Loading...</option>';
+        elPengampu.disabled = true;
+        btnLoad.style.display = 'none';
+        
+        fetch(`${SCRIPT_URL}?action=getGuru&kelas=${this.value}`)
+            .then(res => res.json())
             .then(data => {
                 let html = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
-                if(Array.isArray(data) && data.length > 0) {
-                    data.forEach(nama => html += `<option value="${nama}">${nama}</option>`);
-                } else {
-                    html = '<option disabled>Data tidak ditemukan</option>';
-                }
+                data.forEach(n => html += `<option value="${n}">${n}</option>`);
                 elPengampu.innerHTML = html;
                 elPengampu.disabled = false;
-            })
-            .catch(error => {
-                console.error(error);
-                elPengampu.innerHTML = '<option disabled>Gagal Koneksi</option>';
-                alert("Gagal mengambil data guru. Pastikan internet lancar.");
             });
     });
 
-    // --- 2. PILIH GURU -> CARI SISWA (GET) ---
-    elPengampu.addEventListener('change', function() {
-        const guruVal = this.value;
-        const kelasVal = elKelas.value; 
+    // 2. ENABLE LOAD BUTTON
+    elPengampu.addEventListener('change', () => {
+        btnLoad.style.display = 'block';
+    });
+
+    // 3. GET SISWA & GENERATE CARDS (THE MAGIC)
+    btnLoad.addEventListener('click', function() {
+        const k = elKelas.value;
+        const g = elPengampu.value;
         
-        elSiswa.innerHTML = '<option>⏳ Mengambil siswa...</option>';
-        elSiswa.disabled = true;
-
-        const url = `${SCRIPT_URL}?action=getSiswa&kelas=${kelasVal}&guru=${encodeURIComponent(guruVal)}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                let html = '<option value="" disabled selected>-- Pilih Siswa --</option>';
-                if (!data || data.length === 0) {
-                    html = '<option disabled>Tidak ada data siswa</option>';
-                } else {
-                    data.forEach(nama => html += `<option value="${nama}">${nama}</option>`);
+        areaList.innerHTML = '<div style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin fa-2x" style="color:var(--accent)"></i><p>Mengambil Data Siswa...</p></div>';
+        
+        fetch(`${SCRIPT_URL}?action=getSiswa&kelas=${k}&guru=${encodeURIComponent(g)}`)
+            .then(res => res.json())
+            .then(siswaList => {
+                if(!siswaList || siswaList.length === 0) {
+                    areaList.innerHTML = '<div style="text-align:center; color:red">Tidak ada siswa ditemukan.</div>';
+                    return;
                 }
-                elSiswa.innerHTML = html;
-                elSiswa.disabled = false;
-            })
-            .catch(error => {
-                alert("Gagal memuat siswa: " + error);
-                elSiswa.innerHTML = '<option disabled>Gagal Memuat</option>';
+                renderBulkForm(siswaList);
             });
     });
 
-    // --- 3. LOGIKA TAMPILAN (MENU) ---
-    
-    function cekKehadiran() {
-        const val = document.getElementById('kehadiran').value;
-        const secTahsin = document.getElementById('section-tahsin'); // Pastikan ID section ini ada di HTML
-        const secTahfidz = document.getElementById('section-tahfidz');
+    // --- FUNGSI RENDER (MEMBUAT TAMPILAN PER SISWA) ---
+    function renderBulkForm(list) {
+        let html = '';
+        list.forEach((nama, i) => {
+            // Kita generate ID unik per siswa (idx)
+            html += `
+            <div class="student-card" id="card-${i}">
+                <div class="student-header">
+                    <div class="student-name">
+                        <i class="fa-solid fa-user-graduate" style="color:var(--accent); margin-right:5px;"></i> ${nama}
+                        <input type="hidden" id="nama-${i}" value="${nama}">
+                    </div>
+                    <div style="width: 110px;">
+                        <select id="hadir-${i}" class="mini-select" style="padding: 5px;" onchange="toggleHadir(${i})">
+                            <option value="Hadir">✅ Hadir</option>
+                            <option value="Sakit">🤒 Sakit</option>
+                            <option value="Izin">📩 Izin</option>
+                            <option value="Alpha">❌ Alpha</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="row-setor-${i}" class="input-group">
+                    <label style="color:var(--accent)">Status Setoran Hari Ini?</label>
+                    <select id="statusSetor-${i}" class="mini-select" style="border-color:var(--accent); font-weight:600;" onchange="toggleSetor(${i})">
+                        <option value="Tidak Setor">Tidak Setor</option>
+                        <option value="Setor">🎯 YA, SETOR HAFALAN</option>
+                    </select>
+                </div>
+
+                <div id="details-${i}" class="hidden-details">
+                    
+                    <div class="badge-tahsin"><i class="fa-solid fa-book-open"></i> PROGRES TAHSIN</div>
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-bookmark"></i>
+                            <input type="text" id="tilawah-${i}" class="mini-input" placeholder="Batas Tilawah (Juz/Hal)...">
+                        </div>
+                    </div>
+
+                    <div class="badge-tahfidz"><i class="fa-solid fa-quran"></i> PROGRES TAHFIDZ</div>
+                    <div class="input-group">
+                        <label>Batas Tahfidz (Surat & Ayat)</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-pen-nib"></i>
+                            <input type="text" id="tahfidz-${i}" class="mini-input" placeholder="Wajib diisi jika setor...">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Target Berikutnya (Opsional)</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-award"></i>
+                            <input type="text" id="target-${i}" class="mini-input" placeholder="Target besok...">
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
         
-        if(val === 'Hadir') {
-            secTahsin.style.display = 'block';
-            secTahsin.classList.add('show');
-        } else {
-            secTahsin.style.display = 'none';
-            secTahsin.classList.remove('show');
-            secTahfidz.style.display = 'none';
-            secTahfidz.classList.remove('show');
-            resetScoringFields();
-        }
+        areaList.innerHTML = html;
+        countSpan.innerText = list.length;
+        actionBar.style.display = 'flex';
+        
+        // Auto scroll sedikit kebawah
+        window.scrollBy({ top: 200, behavior: 'smooth' });
     }
 
-    function cekSetoran() {
-        const val = document.getElementById('statusSetor').value;
-        const secTahfidz = document.getElementById('section-tahfidz');
+    // --- LOGIKA CARD (DUPLIKASI LOGIKA LAMA PER BARIS) ---
+    window.toggleHadir = (i) => {
+        const val = document.getElementById(`hadir-${i}`).value;
+        const card = document.getElementById(`card-${i}`);
+        const rowSetor = document.getElementById(`row-setor-${i}`);
+        const selectSetor = document.getElementById(`statusSetor-${i}`);
+        
+        if(val !== 'Hadir') {
+            card.classList.add('absent');
+            rowSetor.style.display = 'none'; // Sembunyikan opsi setor
+            selectSetor.value = 'Tidak Setor'; // Reset
+            toggleSetor(i); // Trigger hide details
+        } else {
+            card.classList.remove('absent');
+            rowSetor.style.display = 'block';
+        }
+    };
+
+    window.toggleSetor = (i) => {
+        const val = document.getElementById(`statusSetor-${i}`).value;
+        const details = document.getElementById(`details-${i}`);
+        const card = document.getElementById(`card-${i}`);
+        
         if(val === 'Setor') {
-            secTahfidz.style.display = 'block';
-            secTahfidz.classList.add('show');
+            details.classList.add('show-details');
+            card.classList.add('active-setor');
         } else {
-            secTahfidz.style.display = 'none';
-            secTahfidz.classList.remove('show');
-            document.getElementById('batasTahfidz').value = "";
-            document.getElementById('target').value = ""; // Reset Target
+            details.classList.remove('show-details');
+            card.classList.remove('active-setor');
+            // Reset fields
+            document.getElementById(`tilawah-${i}`).value = '';
+            document.getElementById(`tahfidz-${i}`).value = '';
+            document.getElementById(`target-${i}`).value = '';
         }
-    }
+    };
 
-    function resetScoringFields() {
-        // Hapus reset nilaiTahsin karena sudah tidak ada
-        document.getElementById('batasTilawah').value = "";
-        document.getElementById('statusSetor').value = "";
-        document.getElementById('batasTahfidz').value = "";
+    // --- SUBMIT SEMUA DATA ---
+    window.submitData = () => {
+        const cards = document.querySelectorAll('.student-card');
+        const k = elKelas.value;
+        const g = elPengampu.value;
+        const btn = document.querySelector('.btn-submit');
         
-        // Cek apakah elemen target ada sebelum di-reset (untuk menghindari error jika elemen belum dibuat)
-        const elTarget = document.getElementById('target');
-        if(elTarget) elTarget.value = ""; 
-    }
+        let payload = [];
+        let errorMsg = null;
 
-    // --- 4. SUBMIT HANDLER (POST) ---
-    document.getElementById('t2qForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+        // Loop setiap kartu untuk ambil datanya
+        cards.forEach((c, i) => {
+            const nama = document.getElementById(`nama-${i}`).value;
+            const hadir = document.getElementById(`hadir-${i}`).value;
+            const setor = document.getElementById(`statusSetor-${i}`).value;
+            
+            let dTilawah = "-", dTahfidz = "-", dTarget = "-";
 
-        // Validasi
-        const statusHadir = document.getElementById('kehadiran').value;
-        const statusSetor = document.getElementById('statusSetor').value;
-        const batasTahfidz = document.getElementById('batasTahfidz').value;
+            if (hadir === 'Hadir') {
+                // Ambil nilai walau tidak setor (untuk tilawah mungkin diisi walau tidak setor hafalan)
+                dTilawah = document.getElementById(`tilawah-${i}`).value;
 
-        // Validasi jika Setor Hafalan, maka batas & target wajib diisi
-        if (statusHadir === 'Hadir' && statusSetor === 'Setor') {
-             if(!batasTahfidz.trim()) {
-                alert("⚠️ Mohon isi Batas Tahfidz.");
-                document.getElementById('batasTahfidz').focus();
-                return; 
-             }
-             // Validasi Target (Opsional, aktifkan jika target wajib diisi)
-             /*
-             if(document.getElementById('target').value === "") {
-                alert("⚠️ Mohon isi Target.");
-                document.getElementById('target').focus();
-                return;
-             }
-             */
+                if (setor === 'Setor') {
+                    dTahfidz = document.getElementById(`tahfidz-${i}`).value;
+                    dTarget = document.getElementById(`target-${i}`).value;
+
+                    // VALIDASI: Jika setor, tahfidz wajib isi
+                    if (!dTahfidz.trim()) {
+                        document.getElementById(`tahfidz-${i}`).style.borderColor = 'red';
+                        errorMsg = `Mohon isi Batas Tahfidz untuk siswa: ${nama}`;
+                    }
+                }
+            }
+
+            payload.push({
+                kelas: k,
+                pengampu: g,
+                siswa: nama,
+                kehadiran: hadir,
+                statusSetor: setor,
+                batasTilawah: dTilawah,
+                batasTahfidz: dTahfidz,
+                target: dTarget
+            });
+        });
+
+        if(errorMsg) {
+            alert("⚠️ " + errorMsg);
+            return;
         }
 
-        if(!confirm("Apakah data sudah benar dan siap dikirim?")) return;
+        if(!confirm(`Yakin kirim data untuk ${payload.length} siswa?`)) return;
 
-        // Loading State
-        const originalBtnText = btnSubmit.innerHTML;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN...';
-        btnSubmit.disabled = true;
+        // ANIMASI LOADING
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> MENGIRIM...';
+        btn.disabled = true;
 
-        // Siapkan Object Data (Updated)
-        const objData = {
-            kelas: elKelas.value,
-            pengampu: elPengampu.value,
-            siswa: elSiswa.value,
-            kehadiran: statusHadir,
-            // nilaiTahsin dihapus
-            batasTilawah: document.getElementById('batasTilawah').value,
-            statusSetor: statusSetor,
-            batasTahfidz: batasTahfidz,
-            target: document.getElementById('target').value // Mengambil value dari ID target
-        };
-
-        // Kirim Fetch
         fetch(SCRIPT_URL, {
             method: 'POST',
-            body: JSON.stringify(objData)
+            body: JSON.stringify(payload)
         })
-        .then(response => response.json())
-        .then(result => {
-            if(result.status === 'success') {
-                alert("✅ ALHAMDULILLAH\nData Berhasil Disimpan!");
-                
-                // Reset
-                elSiswa.value = ""; 
-                document.getElementById('kehadiran').value = ""; 
-                resetScoringFields();
-                
-                // Sembunyikan section
-                document.getElementById('section-tahsin').style.display = 'none';
-                document.getElementById('section-tahfidz').style.display = 'none';
-                
-                btnSubmit.innerHTML = originalBtnText;
-                btnSubmit.disabled = false;
-                elSiswa.focus();
+        .then(res => res.json())
+        .then(res => {
+            if(res.status === 'success') {
+                alert("✅ SUKSES! Data tersimpan.");
+                window.location.reload();
             } else {
-                throw new Error(result.message);
+                throw new Error(res.message);
             }
         })
         .catch(err => {
-            alert("❌ GAGAL MENYIMPAN: \n" + err);
-            btnSubmit.innerHTML = originalBtnText;
-            btnSubmit.disabled = false;
+            alert("Gagal: " + err);
+            btn.innerHTML = oldText;
+            btn.disabled = false;
         });
-    });
+    };
 </script>
 
 </body>
-
 </html>
-
-
-
-
-
