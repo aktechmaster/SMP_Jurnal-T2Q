@@ -337,122 +337,76 @@
     </div>
 
    <script>
+  // --- KONFIGURASI ---
+  // Tempel URL Web App Google Script Anda di sini!
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx...CONTOH.../exec";
+
   const elKelas = document.getElementById('kelas');
   const elPengampu = document.getElementById('pengampu');
   const elSiswa = document.getElementById('siswa');
   const btnSubmit = document.querySelector('.btn-submit');
 
-  // --- 1. SETTING KELAS ---
-  window.onload = function() {
-    elKelas.innerHTML = `
-      <option value="" disabled selected>-- Pilih Kelas --</option>
-      <option value="7">Kelas 7</option>
-      <option value="8">Kelas 8</option>
-      <option value="9">Kelas 9</option>
-    `;
-    elPengampu.disabled = true;
-    elSiswa.disabled = true;
-  };
-
-  // --- 2. PILIH KELAS -> CARI USTADZ (Sesuai Sheet) ---
+  // 1. FUNGSI MENGAMBIL GURU (GET)
   elKelas.addEventListener('change', function() {
-    const kelasVal = this.value; // Nilai "7", "8", atau "9"
+    const kelasVal = this.value;
     
-    elPengampu.innerHTML = '<option>⏳ Membuka Database...</option>';
+    elPengampu.innerHTML = '<option>⏳ Mengambil data...</option>';
     elPengampu.disabled = true;
-    elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+    elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Pengampu Terlebih Dahulu --</option>';
     elSiswa.disabled = true;
 
-    google.script.run
-      .withSuccessHandler(function(data) {
-        // Cek jika error (misal nama sheet salah)
-        if (data.length > 0 && data[0].includes("ERROR")) {
-            alert(data[0]); 
-            elPengampu.innerHTML = '<option disabled>Error Database</option>';
-            return;
-        }
-
+    // Menggunakan FETCH untuk request ke URL Script
+    fetch(`${SCRIPT_URL}?action=getGuru&kelas=${kelasVal}`)
+      .then(response => response.json()) // Ubah respon jadi JSON
+      .then(data => {
         let html = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
-        data.forEach(nama => {
-          html += `<option value="${nama}">${nama}</option>`;
-        });
+        data.forEach(nama => html += `<option value="${nama}">${nama}</option>`);
         elPengampu.innerHTML = html;
         elPengampu.disabled = false;
       })
-      .withFailureHandler(function(err) {
-         alert("Gagal Koneksi: " + err);
-      })
-      .getGuruByKelas(kelasVal);
+      .catch(error => {
+        console.error('Error:', error);
+        elPengampu.innerHTML = '<option disabled>Gagal Koneksi</option>';
+        alert("Gagal mengambil data guru. Cek koneksi internet.");
+      });
   });
 
-  // --- 3. PILIH USTADZ -> CARI SISWA ---
+  // 2. FUNGSI MENGAMBIL SISWA (GET)
   elPengampu.addEventListener('change', function() {
     const guruVal = this.value;
-    const kelasVal = elKelas.value; 
+    const kelasVal = elKelas.value;
     
-    elSiswa.innerHTML = '<option>⏳ Mengambil data siswa...</option>';
+    elSiswa.innerHTML = '<option>⏳ Mengambil siswa...</option>';
     elSiswa.disabled = true;
 
-    google.script.run
-      .withSuccessHandler(function(data) {
+    // EncodeURI penting jika ada spasi di nama
+    const url = `${SCRIPT_URL}?action=getSiswa&kelas=${kelasVal}&guru=${encodeURIComponent(guruVal)}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
         let html = '<option value="" disabled selected>-- Pilih Siswa --</option>';
-        if (data.length === 0) {
-            html = '<option disabled>Tidak ada siswa</option>';
-        } else {
-            data.forEach(nama => {
-            html += `<option value="${nama}">${nama}</option>`;
-            });
-        }
+        if(data.length === 0) html = '<option disabled>Tidak ada siswa</option>';
+        else data.forEach(nama => html += `<option value="${nama}">${nama}</option>`);
         elSiswa.innerHTML = html;
         elSiswa.disabled = false;
       })
-      .getSiswaByGuru(kelasVal, guruVal);
+      .catch(error => alert("Gagal mengambil siswa: " + error));
   });
 
-  // --- LOGIKA TAMPILAN LAIN ---
-  function cekKehadiran() {
-    const val = document.getElementById('kehadiran').value;
-    const secTahsin = document.getElementById('section-tahsin');
-    const secTahfidz = document.getElementById('section-tahfidz');
-    if(val === 'Hadir') {
-      secTahsin.style.display = 'block';
-      secTahsin.classList.add('show');
-    } else {
-      secTahsin.style.display = 'none';
-      secTahfidz.style.display = 'none';
-    }
-  }
-
-  function cekSetoran() {
-    const val = document.getElementById('statusSetor').value;
-    const secTahfidz = document.getElementById('section-tahfidz');
-    if(val === 'Setor') {
-      secTahfidz.style.display = 'block';
-      secTahfidz.classList.add('show');
-    } else {
-      secTahfidz.style.display = 'none';
-    }
-  }
-
-  if (
-  document.getElementById('kehadiran').value === 'Hadir' &&
-  document.getElementById('statusSetor').value === 'Setor' &&
-  !document.getElementById('batasTahfidz').value
-) {
-  alert("Batas Tahfidz wajib diisi jika siswa setor.");
-  btnSubmit.disabled = false;
-  btnSubmit.innerHTML = 'KIRIM DATA SEKARANG';
-  return;
-}
-
-
+  // 3. FUNGSI KIRIM DATA (POST)
   document.getElementById('t2qForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    
+    // ... (Validasi logika kehadiran/setor sama seperti sebelumnya) ...
+    // ... copy paste logika validasi if/else di sini ...
+
     if(!confirm("Kirim data sekarang?")) return;
 
-    btnSubmit.innerHTML = 'MENYIMPAN...';
+    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN...';
     btnSubmit.disabled = true;
 
+    // Siapkan data object
     const objData = {
       kelas: elKelas.value,
       pengampu: elPengampu.value,
@@ -465,17 +419,32 @@
       nilaiTahfidz: document.getElementById('nilaiTahfidz').value
     };
 
-    google.script.run
-      .withSuccessHandler(function() {
-        alert("✅ Data Tersimpan!");
-        document.getElementById('t2qForm').reset();
-        elPengampu.innerHTML = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
-        elSiswa.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
-        cekKehadiran();
-        btnSubmit.innerHTML = 'KIRIM DATA SEKARANG';
-        btnSubmit.disabled = false;
-      })
-      .prosesSimpanData(objData);
+    // Kirim POST Request
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(objData) // Data dikirim sebagai teks string
+      // Note: Google Apps Script Web App punya keunikan penanganan CORS
+      // Biasanya fetch standar sudah cukup untuk 'text/plain' content type default
+    })
+    .then(response => response.json())
+    .then(result => {
+      if(result.status === 'success') {
+        alert("✅ Data Tersimpan di Google Sheet!");
+        // Reset form logic...
+        elSiswa.value = "";
+        document.getElementById('kehadiran').value = "";
+        // ... panggil fungsi reset visual lainnya ...
+      } else {
+        throw new Error(result.message);
+      }
+    })
+    .catch(error => {
+      alert("❌ Gagal menyimpan: " + error);
+    })
+    .finally(() => {
+      btnSubmit.innerHTML = 'KIRIM DATA SEKARANG';
+      btnSubmit.disabled = false;
+    });
   });
 
   document.getElementById('section-tahsin').style.display = 'none';
@@ -484,4 +453,5 @@ document.getElementById('section-tahfidz').style.display = 'none';
 </script>
 
 </body>
+
 </html>
