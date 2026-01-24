@@ -34,6 +34,27 @@
             align-items: flex-start; /* Ubah ke start agar bisa scroll panjang */
             min-height: 100vh;
             padding: 20px 10px;
+
+            /* Update di bagian body yang sudah ada */
+body {
+    /* ... properti lainnya biarkan saja ... */
+    display: flex;
+    justify-content: center;
+    
+    /* TAMBAHKAN/PASTIKAN 2 BARIS INI ADA: */
+    flex-direction: column; 
+    align-items: center; 
+}
+
+/* Tambahkan style baru ini di paling bawah style */
+.footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 20px;       /* Jarak dari kartu putih */
+    margin-bottom: 100px;   /* PENTING: Jarak agar tidak tertutup tombol melayang */
+    width: 100%;
+}
         }
 
         .container {
@@ -156,6 +177,14 @@
             <p>Smart Input System</p>
         </div>
 
+        </form>
+    </div> <div class="footer">
+        &copy; 2026 IT Department026 aktechmaster | Designed & Developed by aktechmaster
+    </div>
+
+    <div class="bottom-action" id="action-bar" style="display:none;">
+        </div>
+
         <div class="control-area">
             <div class="input-group">
                 <label>Pilih Kelas</label>
@@ -199,10 +228,6 @@
             KIRIM DATA (<span id="count-siswa">0</span>) SISWA <i class="fa-solid fa-paper-plane"></i>
         </button>
     </div>
-    
-<div class="footer">
-            &copy; 2026 IT Department026 aktechmaster | Designed & Developed by aktechmaster
-        </div>
     
 <script>
     // --- GANTI URL INI DENGAN HASIL DEPLOY TERBARU ---
@@ -439,6 +464,7 @@
 
 </body>
 </html>
+
 
 
 
