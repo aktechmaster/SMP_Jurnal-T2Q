@@ -391,25 +391,23 @@
         cards.forEach((c, i) => {
             const nama = document.getElementById(`nama-${i}`).value;
             const hadir = document.getElementById(`hadir-${i}`).value;
-            
-            // Ubah const menjadi let agar nilainya bisa kita manipulasi
-            let setor = document.getElementById(`statusSetor-${i}`).value; 
+            let setor = document.getElementById(`statusSetor-${i}`).value;
             
             let dTilawah = "-", dTahfidz = "-", dTarget = "-";
 
-            // LOGIKA BARU: Jika tidak hadir, paksa status setor menjadi "-"
+            // LOGIKA BARU: Jika tidak hadir, ubah status setor jadi "-"
             if (hadir !== 'Hadir') {
                 setor = "-";
             } else {
-                // Logika lama (jika Hadir) tetap berjalan normal
-                dTilawah = document.getElementById(`tilawah-${i}`).value || "-";
+                // Ambil nilai tilawah walau tidak setor, beri default "-" jika kosong
+                dTilawah = document.getElementById(`tilawah-${i}`).value.trim() || "-";
 
                 if (setor === 'Setor') {
-                    dTahfidz = document.getElementById(`tahfidz-${i}`).value;
-                    dTarget = document.getElementById(`target-${i}`).value || "-";
+                    dTahfidz = document.getElementById(`tahfidz-${i}`).value.trim();
+                    dTarget = document.getElementById(`target-${i}`).value.trim() || "-";
 
                     // VALIDASI: Jika setor, tahfidz wajib isi
-                    if (!dTahfidz.trim()) {
+                    if (!dTahfidz) {
                         document.getElementById(`tahfidz-${i}`).style.borderColor = 'red';
                         errorMsg = `Mohon isi Batas Tahfidz untuk siswa: ${nama}`;
                     }
@@ -421,9 +419,9 @@
                 pengampu: g,
                 siswa: nama,
                 kehadiran: hadir,
-                statusSetor: setor, // Sekarang akan mengirim "-" jika tidak hadir
+                statusSetor: setor,
                 batasTilawah: dTilawah,
-                batasTahfidz: dTahfidz,
+                batasTahfidz: dTahfidz || "-", // Mencegah dTahfidz kosong di Excel
                 target: dTarget
             });
         });
@@ -434,31 +432,6 @@
         }
 
         if(!confirm(`Yakin kirim data untuk ${payload.length} siswa?`)) return;
-
-        // ANIMASI LOADING
-        const oldText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> MENGIRIM...';
-        btn.disabled = true;
-
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(res => {
-            if(res.status === 'success') {
-                alert("✅ SUKSES! Data tersimpan.");
-                window.location.reload();
-            } else {
-                throw new Error(res.message);
-            }
-        })
-        .catch(err => {
-            alert("Gagal: " + err);
-            btn.innerHTML = oldText;
-            btn.disabled = false;
-        });
-    };
 
         // ANIMASI LOADING
         const oldText = btn.innerHTML;
