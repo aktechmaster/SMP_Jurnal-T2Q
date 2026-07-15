@@ -391,17 +391,22 @@
         cards.forEach((c, i) => {
             const nama = document.getElementById(`nama-${i}`).value;
             const hadir = document.getElementById(`hadir-${i}`).value;
-            const setor = document.getElementById(`statusSetor-${i}`).value;
+            
+            // Ubah const menjadi let agar nilainya bisa kita manipulasi
+            let setor = document.getElementById(`statusSetor-${i}`).value; 
             
             let dTilawah = "-", dTahfidz = "-", dTarget = "-";
 
-            if (hadir === 'Hadir') {
-                // Ambil nilai walau tidak setor (untuk tilawah mungkin diisi walau tidak setor hafalan)
-                dTilawah = document.getElementById(`tilawah-${i}`).value;
+            // LOGIKA BARU: Jika tidak hadir, paksa status setor menjadi "-"
+            if (hadir !== 'Hadir') {
+                setor = "-";
+            } else {
+                // Logika lama (jika Hadir) tetap berjalan normal
+                dTilawah = document.getElementById(`tilawah-${i}`).value || "-";
 
                 if (setor === 'Setor') {
                     dTahfidz = document.getElementById(`tahfidz-${i}`).value;
-                    dTarget = document.getElementById(`target-${i}`).value;
+                    dTarget = document.getElementById(`target-${i}`).value || "-";
 
                     // VALIDASI: Jika setor, tahfidz wajib isi
                     if (!dTahfidz.trim()) {
@@ -416,7 +421,7 @@
                 pengampu: g,
                 siswa: nama,
                 kehadiran: hadir,
-                statusSetor: setor,
+                statusSetor: setor, // Sekarang akan mengirim "-" jika tidak hadir
                 batasTilawah: dTilawah,
                 batasTahfidz: dTahfidz,
                 target: dTarget
@@ -429,6 +434,31 @@
         }
 
         if(!confirm(`Yakin kirim data untuk ${payload.length} siswa?`)) return;
+
+        // ANIMASI LOADING
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> MENGIRIM...';
+        btn.disabled = true;
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if(res.status === 'success') {
+                alert("✅ SUKSES! Data tersimpan.");
+                window.location.reload();
+            } else {
+                throw new Error(res.message);
+            }
+        })
+        .catch(err => {
+            alert("Gagal: " + err);
+            btn.innerHTML = oldText;
+            btn.disabled = false;
+        });
+    };
 
         // ANIMASI LOADING
         const oldText = btn.innerHTML;
