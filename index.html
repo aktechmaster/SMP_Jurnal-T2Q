@@ -235,20 +235,32 @@
     const countSpan = document.getElementById('count-siswa');
 
     // 1. GET GURU
-    elKelas.addEventListener('change', function() {
-        elPengampu.innerHTML = '<option>⏳ Loading...</option>';
-        elPengampu.disabled = true;
-        btnLoad.style.display = 'none';
-        
-        fetch(`${SCRIPT_URL}?action=getGuru&kelas=${this.value}`)
-            .then(res => res.json())
-            .then(data => {
-                let html = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
-                data.forEach(n => html += `<option value="${n}">${n}</option>`);
-                elPengampu.innerHTML = html;
-                elPengampu.disabled = false;
-            });
-    });
+elKelas.addEventListener('change', function() {
+    elPengampu.innerHTML = '<option>⏳ Loading...</option>';
+    elPengampu.disabled = true;
+    btnLoad.style.display = 'none';
+    
+    fetch(`${SCRIPT_URL}?action=getGuru&kelas=${encodeURIComponent(this.value)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (!Array.isArray(data)) {
+                throw new Error(data.message || "Data pengampu bukan array");
+            }
+            if (data.length === 0) {
+                elPengampu.innerHTML = '<option value="" disabled selected>-- Pengampu Tidak Ditemukan --</option>';
+                return;
+            }
+
+            let html = '<option value="" disabled selected>-- Pilih Pengampu --</option>';
+            data.forEach(n => html += `<option value="${n}">${n}</option>`);
+            elPengampu.innerHTML = html;
+            elPengampu.disabled = false;
+        })
+        .catch(err => {
+            console.error(err);
+            elPengampu.innerHTML = '<option value="" disabled selected>❌ Gagal Memuat Pengampu</option>';
+        });
+});
 
     // 2. ENABLE LOAD BUTTON
     elPengampu.addEventListener('change', () => {
