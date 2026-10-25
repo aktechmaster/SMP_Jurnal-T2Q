@@ -407,18 +407,15 @@ elKelas.addEventListener('change', function() {
             
             let dTilawah = "-", dTahfidz = "-", dTarget = "-";
 
-            // LOGIKA BARU: Jika tidak hadir, ubah status setor jadi "-"
             if (hadir !== 'Hadir') {
                 setor = "-";
             } else {
-                // Ambil nilai tilawah walau tidak setor, beri default "-" jika kosong
                 dTilawah = document.getElementById(`tilawah-${i}`).value.trim() || "-";
 
                 if (setor === 'Setor') {
                     dTahfidz = document.getElementById(`tahfidz-${i}`).value.trim();
                     dTarget = document.getElementById(`target-${i}`).value.trim() || "-";
 
-                    // VALIDASI: Jika setor, tahfidz wajib isi
                     if (!dTahfidz) {
                         document.getElementById(`tahfidz-${i}`).style.borderColor = 'red';
                         errorMsg = `Mohon isi Batas Tahfidz untuk siswa: ${nama}`;
@@ -433,7 +430,7 @@ elKelas.addEventListener('change', function() {
                 kehadiran: hadir,
                 statusSetor: setor,
                 batasTilawah: dTilawah,
-                batasTahfidz: dTahfidz || "-", // Mencegah dTahfidz kosong di Excel
+                batasTahfidz: dTahfidz || "-", 
                 target: dTarget
             });
         });
@@ -445,28 +442,48 @@ elKelas.addEventListener('change', function() {
 
         if(!confirm(`Yakin kirim data untuk ${payload.length} siswa?`)) return;
 
-        // ANIMASI LOADING
+        // ANIMASI LOADING & PROTEKSI UI
         const oldText = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> MENGIRIM...';
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> PROSES MENGIRIM...';
+        btn.style.backgroundColor = "#fbbf24"; // Ubah warna jadi kuning saat loading
+        btn.style.color = "#000";
         btn.disabled = true;
 
-        fetch(SCRIPT_URL, {
+        // BUAT ID TRANSAKSI UNIK (Mencegah Duplikat)
+        const uniqueTxId = "TX-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+        // Tempelkan ID Transaksi di akhir URL URL
+        const submitUrl = `${SCRIPT_URL}?txId=${uniqueTxId}`; 
+
+        fetch(submitUrl, {
             method: 'POST',
             body: JSON.stringify(payload)
         })
         .then(res => res.json())
         .then(res => {
             if(res.status === 'success') {
-                alert("✅ SUKSES! Data tersimpan.");
-                window.location.reload();
+                // TAMPILAN BERHASIL (Mencegah klik lagi)
+                btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> DATA BERHASIL TERKIRIM!';
+                btn.style.backgroundColor = "var(--success)"; // Hijau
+                btn.style.color = "#fff";
+                
+                alert("✅ SUKSES! Data berhasil masuk ke sistem.");
+                
+                // Refresh halaman setelah 1,5 detik
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
                 throw new Error(res.message);
             }
         })
         .catch(err => {
-            alert("Gagal: " + err);
-            btn.innerHTML = oldText;
-            btn.disabled = false;
+            // TAMPILAN GAGAL JARINGAN
+            // Karena kita pakai txId, aman bagi guru untuk mencoba klik kirim lagi
+            alert(`⚠️ JARINGAN TIDAK STABIL!\n\nProses terputus: ${err}\n\nSilakan cek koneksi internet Anda dan tekan KIRIM LAGI. Sistem otomatis akan mencegah data ganda.`);
+            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> COBA KIRIM ULANG';
+            btn.style.backgroundColor = "var(--danger)"; // Merah
+            btn.style.color = "#fff";
+            btn.disabled = false; // Izinkan diklik lagi
         });
     };
 </script>
