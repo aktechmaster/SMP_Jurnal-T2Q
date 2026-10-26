@@ -389,6 +389,9 @@ elKelas.addEventListener('change', function() {
         }
     };
 
+    // --- TAMBAHAN PENTING: Deklarasikan ID di luar fungsi agar tidak berubah saat di-klik ulang ---
+    let currentTxId = null;
+
     // --- SUBMIT SEMUA DATA ---
     window.submitData = () => {
         const cards = document.querySelectorAll('.student-card');
@@ -442,17 +445,20 @@ elKelas.addEventListener('change', function() {
 
         if(!confirm(`Yakin kirim data untuk ${payload.length} siswa?`)) return;
 
-        // ANIMASI LOADING & PROTEKSI UI
         const oldText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> PROSES MENGIRIM...';
-        btn.style.backgroundColor = "#fbbf24"; // Ubah warna jadi kuning saat loading
+        btn.style.backgroundColor = "#fbbf24"; 
         btn.style.color = "#000";
         btn.disabled = true;
 
-        // BUAT ID TRANSAKSI UNIK (Mencegah Duplikat)
-        const uniqueTxId = "TX-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-        // Tempelkan ID Transaksi di akhir URL URL
-        const submitUrl = `${SCRIPT_URL}?txId=${uniqueTxId}`; 
+        // PERBAIKAN LOGIKA ID TRANSAKSI: 
+        // Hanya buat ID baru jika currentTxId kosong (pengiriman pertama kali)
+        if (!currentTxId) {
+            currentTxId = "TX-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+        }
+        
+        // Gunakan ID yang sama jika ini adalah klik "Kirim Ulang"
+        const submitUrl = `${SCRIPT_URL}?txId=${currentTxId}`; 
 
         fetch(submitUrl, {
             method: 'POST',
@@ -461,14 +467,15 @@ elKelas.addEventListener('change', function() {
         .then(res => res.json())
         .then(res => {
             if(res.status === 'success') {
-                // TAMPILAN BERHASIL (Mencegah klik lagi)
                 btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> DATA BERHASIL TERKIRIM!';
-                btn.style.backgroundColor = "var(--success)"; // Hijau
+                btn.style.backgroundColor = "var(--success)"; 
                 btn.style.color = "#fff";
+                
+                // Hapus ID setelah benar-benar sukses, agar siap untuk pengiriman kelas lain
+                currentTxId = null; 
                 
                 alert("✅ SUKSES! Data berhasil masuk ke sistem.");
                 
-                // Refresh halaman setelah 1,5 detik
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
@@ -477,24 +484,16 @@ elKelas.addEventListener('change', function() {
             }
         })
         .catch(err => {
-            // TAMPILAN GAGAL JARINGAN
-            // Karena kita pakai txId, aman bagi guru untuk mencoba klik kirim lagi
-            alert(`⚠️ JARINGAN TIDAK STABIL!\n\nProses terputus: ${err}\n\nSilakan cek koneksi internet Anda dan tekan KIRIM LAGI. Sistem otomatis akan mencegah data ganda.`);
+            // JIKA GAGAL JARINGAN: currentTxId JANGAN dihapus (jangan di-null-kan). 
+            // Sehingga saat guru klik kirim ulang, sistem menembak backend dengan ID yang sama.
+            alert(`⚠️ JARINGAN TIDAK STABIL ATAU LAMBAT!\n\nProses terputus. Silakan cek koneksi internet Anda dan tekan KIRIM ULANG.\n\nSistem otomatis akan mencegah data terinput dua kali.`);
             btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> COBA KIRIM ULANG';
-            btn.style.backgroundColor = "var(--danger)"; // Merah
+            btn.style.backgroundColor = "var(--danger)"; 
             btn.style.color = "#fff";
-            btn.disabled = false; // Izinkan diklik lagi
+            btn.disabled = false; 
         });
     };
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
